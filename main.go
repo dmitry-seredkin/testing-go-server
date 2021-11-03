@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"server/users"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -21,7 +22,8 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	r := mux.NewRouter()
+	r := mux.NewRouter().StrictSlash(true)
 	r.HandleFunc("/", handler)
+	users.HandleUsers(r)
 	log.Fatal(http.ListenAndServe(os.Getenv("BASE_URL"), r))
 }
