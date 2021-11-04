@@ -4,21 +4,18 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
 type User struct {
-	Id        int    `json:"id"`
-	Name      string `json:"name"`
-	BirthDate string `json:"birthDate"`
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
 }
 
-var users = []User{
-	{0, "Dima", "1997-05-03"},
-	{1, "Julia", "1999-11-29"},
-}
+var users = []User{}
 
 func HandleUsers(router *mux.Router) {
 	subRouter := router.PathPrefix("/users").Subrouter()
@@ -91,12 +88,8 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 }
 
 // HELPERS
-func getIdFromVars(r *http.Request) int {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-
-	if err != nil {
-		log.Fatal("Id was not provided")
-	}
+func getIdFromVars(r *http.Request) string {
+	id := mux.Vars(r)["id"]
 
 	return id
 }
