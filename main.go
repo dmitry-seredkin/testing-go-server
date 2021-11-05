@@ -6,16 +6,16 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"server/users"
+	"server/user"
 
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4"
 	"github.com/joho/godotenv"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Testing golang server")
-}
+// func handler(w http.ResponseWriter, r *http.Request) {
+// 	fmt.Fprintf(w, "Testing golang server")
+// }
 
 func main() {
 	err := godotenv.Load()
@@ -30,10 +30,12 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", handler)
-	users.HandleUsers(router)
+	// router.HandleFunc("/", handler)
+	// users.HandleUsers(router)
+
+	userRepository := user.InitializeRepository(conn)
+	user.InitializeController(userRepository, router)
 
 	log.Fatal(http.ListenAndServe(os.Getenv("BASE_URL"), router))
 }
