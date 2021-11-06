@@ -11,6 +11,7 @@ const prefix = "/user"
 
 type repository interface {
 	getUser(id string) (User, error)
+	getUsers() ([]User, error)
 }
 
 type controller struct {
@@ -22,16 +23,28 @@ func InitializeController(repo repository, r *mux.Router) {
 	s := r.PathPrefix(prefix).Subrouter()
 
 	s.HandleFunc("/{id:[a-f0-9-]+}", c.getUser).Methods(http.MethodGet)
+	s.HandleFunc("/all", c.getUsers).Methods(http.MethodGet)
 }
 
 func (c *controller) getUser(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	user, err := c.repo.getUser(id)
-	if (err != nil) {
+	if err != nil {
 		http.Error(w, "User is not found", http.StatusNotFound)
 		return
 	}
 
 	json.NewEncoder(w).Encode(user)
+}
+
+func (c *controller) getUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := c.repo.getUsers()
+	if err != nil {
+		http.Error(w, "Users is not found", http.StatusNotFound)
+		return
+	}
+
+	json.NewEncoder(w).Encode(users)
+
 }

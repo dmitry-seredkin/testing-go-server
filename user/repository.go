@@ -20,7 +20,8 @@ func (repo *repo) getUser(id string) (User, error) {
 
 	err := repo.conn.QueryRow(
 		context.Background(),
-		"SELECT id, name, email, phone FROM users WHERE id=$1", id,
+		"SELECT id, name, email, phone FROM users WHERE id=$1",
+		id,
 	).Scan(
 		&u.Id, &u.Name, &u.Email, &u.Phone,
 	)
@@ -29,4 +30,26 @@ func (repo *repo) getUser(id string) (User, error) {
 	}
 
 	return u, err
+}
+
+func (repo *repo) getUsers() ([]User, error) {
+	users := []User{}
+
+	rows, err := repo.conn.Query(
+		context.Background(),
+		"SELECT id, name FROM users",
+	)
+	if err != nil {
+		log.Println(err.Error())
+	} else {
+		var u User
+
+		for rows.Next() {
+			if err := rows.Scan(&u.Id, &u.Name); err == nil {
+				users = append(users, u)
+			}
+		}
+	}
+
+	return users, err
 }
