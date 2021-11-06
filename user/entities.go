@@ -15,7 +15,13 @@ type UserItem struct {
 }
 
 type CreateUser struct {
-	Name  string `json:"name"`
-	Email null.String `json:"email,omitempty"`
-	Phone null.String `json:"phone,omitempty"`
+	Name     string      `json:"name"`
+	Password string      `json:"password"`
+	Email    null.String `json:"email,omitempty"`
+	Phone    null.String `json:"phone,omitempty"`
+}
+
+type LoginUser struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
 }

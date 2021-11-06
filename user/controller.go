@@ -14,6 +14,7 @@ type repository interface {
 	deleteUser(id string) error
 	getUser(id string) (User, error)
 	getUsers() ([]UserItem, error)
+	loginUser(user LoginUser) (bool, error)
 }
 
 type controller struct {
@@ -26,6 +27,7 @@ func InitializeController(repo repository, r *mux.Router) {
 
 	s.HandleFunc("/all", c.getUsers).Methods(http.MethodGet)
 	s.HandleFunc("/new", c.createUser).Methods(http.MethodPost)
+	s.HandleFunc("/login", c.loginUser).Methods(http.MethodPost)
 	s.HandleFunc("/{id:[a-f0-9-]+}", c.getUser).Methods(http.MethodGet)
 	s.HandleFunc("/{id:[a-f0-9-]+}", c.deleteUser).Methods(http.MethodDelete)
 }
@@ -82,4 +84,22 @@ func (c *controller) getUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
+}
+
+func (c *controller) loginUser(w http.ResponseWriter, r *http.Request) {
+	var loginUser LoginUser
+	decodeErr := json.NewDecoder(r.Body).Decode(&loginUser)
+	if decodeErr != nil {
+		http.Error(w, "Can't decode user information", http.StatusUnprocessableEntity)
+		return
+	}
+
+	isValid, err := c.repo.loginUser(loginUser)
+	if err != nil {
+		http.Error(w, "Users is not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(isValid)
 }

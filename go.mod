@@ -7,6 +7,7 @@ require github.com/gorilla/mux v1.8.0
 require (
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/joho/godotenv v1.4.0
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	gopkg.in/guregu/null.v4 v4.0.0
 )
 
@@ -19,6 +20,5 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.8.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
