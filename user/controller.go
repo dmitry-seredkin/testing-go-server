@@ -11,7 +11,7 @@ const prefix = "/user"
 
 type repository interface {
 	getUser(id string) (User, error)
-	getUsers() ([]User, error)
+	getUsers() ([]UserItem, error)
 }
 
 type controller struct {

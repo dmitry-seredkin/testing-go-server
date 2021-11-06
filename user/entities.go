@@ -8,3 +8,8 @@ type User struct {
 	Email null.String `json:"email"`
 	Phone null.String `json:"phone"`
 }
+
+type UserItem struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}

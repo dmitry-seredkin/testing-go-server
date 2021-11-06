@@ -32,8 +32,8 @@ func (repo *repo) getUser(id string) (User, error) {
 	return u, err
 }
 
-func (repo *repo) getUsers() ([]User, error) {
-	users := []User{}
+func (repo *repo) getUsers() ([]UserItem, error) {
+	users := []UserItem{}
 
 	rows, err := repo.conn.Query(
 		context.Background(),
@@ -42,7 +42,7 @@ func (repo *repo) getUsers() ([]User, error) {
 	if err != nil {
 		log.Println(err.Error())
 	} else {
-		var u User
+		var u UserItem
 
 		for rows.Next() {
 			if err := rows.Scan(&u.Id, &u.Name); err == nil {
