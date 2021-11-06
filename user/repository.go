@@ -31,6 +31,17 @@ func (repo *repo) createUser(cu CreateUser) (User, error) {
 	return u, err
 }
 
+func (repo *repo) deleteUser(id string) error {
+	var returnedId string
+	err := repo.conn.QueryRow(
+		context.Background(),
+		"DELETE FROM users WHERE id=$1 RETURNING id",
+		id,
+	).Scan(&returnedId)
+
+	return err
+}
+
 func (repo *repo) getUser(id string) (User, error) {
 	var u User
 

@@ -11,6 +11,7 @@ const prefix = "/user"
 
 type repository interface {
 	createUser(user CreateUser) (User, error)
+	deleteUser(id string) error
 	getUser(id string) (User, error)
 	getUsers() ([]UserItem, error)
 }
@@ -23,9 +24,10 @@ func InitializeController(repo repository, r *mux.Router) {
 	c := controller{repo}
 	s := r.PathPrefix(prefix).Subrouter()
 
+	s.HandleFunc("/all", c.getUsers).Methods(http.MethodGet)
 	s.HandleFunc("/new", c.createUser).Methods(http.MethodPost)
 	s.HandleFunc("/{id:[a-f0-9-]+}", c.getUser).Methods(http.MethodGet)
-	s.HandleFunc("/all", c.getUsers).Methods(http.MethodGet)
+	s.HandleFunc("/{id:[a-f0-9-]+}", c.deleteUser).Methods(http.MethodDelete)
 }
 
 func (c *controller) createUser(w http.ResponseWriter, r *http.Request) {
@@ -38,13 +40,24 @@ func (c *controller) createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := c.repo.createUser(createUser)
-	if (err != nil) {
+	if err != nil {
 		http.Error(w, "User creation fail", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
+}
+
+func (c *controller) deleteUser(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+	err := c.repo.deleteUser(id)
+	if err != nil {
+		http.Error(w, "User is not found", http.StatusNotFound)
+		return
+	}
+
+	w.Write([]byte("ok"))
 }
 
 func (c *controller) getUser(w http.ResponseWriter, r *http.Request) {
