@@ -46,5 +46,4 @@ func (c *controller) getUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(users)
-
 }

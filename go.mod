@@ -7,6 +7,7 @@ require github.com/gorilla/mux v1.8.0
 require (
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/joho/godotenv v1.4.0
+	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (
