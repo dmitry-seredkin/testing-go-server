@@ -13,10 +13,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// func handler(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Fprintf(w, "Testing golang server")
-// }
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -31,11 +27,11 @@ func main() {
 	defer conn.Close(context.Background())
 
 	router := mux.NewRouter().StrictSlash(true)
-	// router.HandleFunc("/", handler)
-	// users.HandleUsers(router)
+	APIRouter := router.PathPrefix("/api/v1").Subrouter()
+	router.Handle("/", http.FileServer(http.Dir("./views/")))
 
 	userRepository := user.InitializeRepository(conn)
-	user.InitializeController(userRepository, router)
+	user.InitializeController(userRepository, APIRouter)
 
 	log.Fatal(http.ListenAndServe(os.Getenv("BASE_URL"), router))
 }
