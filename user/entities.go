@@ -13,3 +13,9 @@ type UserItem struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
+
+type CreateUser struct {
+	Name  string `json:"name"`
+	Email null.String `json:"email,omitempty"`
+	Phone null.String `json:"phone,omitempty"`
+}

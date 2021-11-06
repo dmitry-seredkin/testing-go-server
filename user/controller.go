@@ -10,6 +10,7 @@ import (
 const prefix = "/user"
 
 type repository interface {
+	createUser(user CreateUser) (User, error)
 	getUser(id string) (User, error)
 	getUsers() ([]UserItem, error)
 }
@@ -22,8 +23,28 @@ func InitializeController(repo repository, r *mux.Router) {
 	c := controller{repo}
 	s := r.PathPrefix(prefix).Subrouter()
 
+	s.HandleFunc("/new", c.createUser).Methods(http.MethodPost)
 	s.HandleFunc("/{id:[a-f0-9-]+}", c.getUser).Methods(http.MethodGet)
 	s.HandleFunc("/all", c.getUsers).Methods(http.MethodGet)
+}
+
+func (c *controller) createUser(w http.ResponseWriter, r *http.Request) {
+	var createUser CreateUser
+
+	decodeErr := json.NewDecoder(r.Body).Decode(&createUser)
+	if decodeErr != nil {
+		http.Error(w, "Can't decode user information", http.StatusUnprocessableEntity)
+		return
+	}
+
+	user, err := c.repo.createUser(createUser)
+	if (err != nil) {
+		http.Error(w, "User creation fail", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }
 
 func (c *controller) getUser(w http.ResponseWriter, r *http.Request) {

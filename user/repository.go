@@ -15,6 +15,22 @@ func InitializeRepository(conn *pgx.Conn) *repo {
 	return &repo{conn}
 }
 
+func (repo *repo) createUser(cu CreateUser) (User, error) {
+	var u User
+	err := repo.conn.QueryRow(
+		context.Background(),
+		"INSERT INTO users (name, email, phone) VALUES ($1, $2, $3) RETURNING id, name, email, phone",
+		&cu.Name, &cu.Email, &cu.Phone,
+	).Scan(
+		&u.Id, &u.Name, &u.Email, &u.Phone,
+	)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	return u, err
+}
+
 func (repo *repo) getUser(id string) (User, error) {
 	var u User
 
