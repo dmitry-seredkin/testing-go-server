@@ -4,6 +4,7 @@ import "gopkg.in/guregu/null.v4"
 
 type User struct {
 	Id    string      `json:"id"`
+	Login string      `json:"login"`
 	Name  string      `json:"name"`
 	Email null.String `json:"email"`
 	Phone null.String `json:"phone"`
@@ -15,13 +16,20 @@ type UserItem struct {
 }
 
 type CreateUser struct {
+	Login    string      `json:"login"`
 	Name     string      `json:"name"`
 	Password string      `json:"password"`
 	Email    null.String `json:"email,omitempty"`
 	Phone    null.String `json:"phone,omitempty"`
 }
 
+type UpdateUser struct {
+	Name  null.String `json:"name"`
+	Email null.String `json:"email,omitempty"`
+	Phone null.String `json:"phone,omitempty"`
+}
+
 type LoginUser struct {
-	Name     string `json:"name"`
+	Login    string `json:"login"`
 	Password string `json:"password"`
 }

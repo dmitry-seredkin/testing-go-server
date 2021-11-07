@@ -22,10 +22,14 @@ func (repo *repo) createUser(user CreateUser) (User, error) {
 	var u User
 	err := repo.conn.QueryRow(
 		context.Background(),
-		"INSERT INTO users (name, password, email, phone) VALUES ($1, $2, $3, $4) RETURNING id, name, email, phone",
-		&user.Name, hash, &user.Email, &user.Phone,
+		`
+			INSERT INTO users (login, name, password, email, phone)
+			VALUES ($1, $2, $3, $4, $5) 
+			RETURNING id, login, name, email, phone
+		`,
+		&user.Login, &user.Name, hash, &user.Email, &user.Phone,
 	).Scan(
-		&u.Id, &u.Name, &u.Email, &u.Phone,
+		&u.Id, &u.Login, &u.Name, &u.Email, &u.Phone,
 	)
 	if err != nil {
 		log.Println(err.Error())
@@ -88,9 +92,32 @@ func (repo *repo) loginUser(user LoginUser) (bool, error) {
 	var hash string
 	err := repo.conn.QueryRow(
 		context.Background(),
-		"SELECT password FROM users WHERE name=$1",
-		user.Name,
+		"SELECT password FROM users WHERE login=$1",
+		user.Login,
 	).Scan(&hash)
 
 	return repo.userService.checkPassword(user.Password, hash), err
+}
+
+func (repo *repo) updateUser(id string, user UpdateUser) (User, error) {
+	var u User
+	err := repo.conn.QueryRow(
+		context.Background(),
+		`
+			UPDATE users SET
+				name = COALESCE($2, name),
+				email = COALESCE($3, email),
+				phone = COALESCE($4, phone)
+			WHERE id=$1
+			RETURNING id, login, name, email, phone
+		`,
+		id, &user.Name, &user.Email, &user.Phone,
+	).Scan(
+		&u.Id, &u.Login, &u.Name, &u.Email, &u.Phone,
+	)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	return u, err
 }
