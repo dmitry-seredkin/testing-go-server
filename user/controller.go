@@ -15,6 +15,7 @@ type repository interface {
 	getUser(id string) (User, error)
 	getUsers() ([]UserItem, error)
 	loginUser(user LoginUser) (bool, error)
+	updateUser(id string, user UpdateUser) (User, error)
 }
 
 type controller struct {
@@ -30,6 +31,7 @@ func InitializeController(repo repository, r *mux.Router) {
 	s.HandleFunc("/login", c.loginUser).Methods(http.MethodPost)
 	s.HandleFunc("/{id:[a-f0-9-]+}", c.getUser).Methods(http.MethodGet)
 	s.HandleFunc("/{id:[a-f0-9-]+}", c.deleteUser).Methods(http.MethodDelete)
+	s.HandleFunc("/{id:[a-f0-9-]+}", c.updateUser).Methods(http.MethodPut)
 }
 
 func (c *controller) createUser(w http.ResponseWriter, r *http.Request) {
@@ -102,4 +104,23 @@ func (c *controller) loginUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(isValid)
+}
+
+func (c *controller) updateUser(w http.ResponseWriter, r *http.Request) {
+	var updateUser UpdateUser
+	id := mux.Vars(r)["id"]
+	decodeErr := json.NewDecoder(r.Body).Decode(&updateUser)
+	if decodeErr != nil {
+		http.Error(w, "Can't decode user information", http.StatusUnprocessableEntity)
+		return
+	}
+
+	user, err := c.repo.updateUser(id, updateUser)
+	if err != nil {
+		http.Error(w, "User updating fail", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }
